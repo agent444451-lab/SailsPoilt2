@@ -46,6 +46,13 @@
   },
   "nav": {
     "primary": "التنقل الرئيسي",
+    "sections": {
+      "main": "نظرة عامة",
+      "organization": "المنظمة",
+      "sales": "المبيعات والأداء",
+      "admin": "الإدارة",
+      "account": "الحساب"
+    },
     "dashboard": "لوحة المؤشرات",
     "companies": "الشركات",
     "branches": "الفروع",
@@ -209,11 +216,18 @@
     "statBranches": "الفروع",
     "statTeams": "الفرق",
     "platformTitle": "نظرة عامة على المنصة",
+    "platformSubtitle": "متابعة الشركات والمديرين والموظفين عبر المنصة.",
     "platformCompanies": "الشركات",
     "platformCompanyAdmins": "مديرو الشركات",
     "platformEmployees": "الموظفون المسجلون",
     "platformPendingRequests": "طلبات كلمات مرور معلقة",
-    "platformRecentApproved": "طلبات تمت الموافقة عليها خلال 7 أيام"
+    "platformRecentApproved": "طلبات تمت الموافقة عليها خلال 7 أيام",
+    "quickActions": "إجراءات سريعة",
+    "recentActivity": "النشاط الأخير",
+    "noActivity": "لا يوجد نشاط أخير لعرضه.",
+    "viewAll": "عرض الكل",
+    "overviewCard": "لمحة عن الشركة",
+    "overviewCardBody": "ملخص حي لقوة العمل ونشاط المبيعات لديك."
   },
   "states": {
     "noPermissionTitle": "ليست لديك صلاحية الوصول إلى هذا القسم",

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/shared/utils/cn';
 
 export function Modal({
   open,
@@ -18,21 +19,31 @@ export function Modal({
   children: ReactNode;
   size?: 'md' | 'lg';
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-primary-900/40 backdrop-blur-[2px]" />
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-primary-900/40 backdrop-blur-[2px] animate-fade-in" />
         <Dialog.Content
-          className={`fixed inset-x-4 top-1/2 z-50 max-h-[90dvh] -translate-y-1/2 overflow-y-auto rounded-2xl bg-white p-6 shadow-xl focus:outline-none sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 ${
-            size === 'lg' ? 'sm:w-[min(48rem,calc(100vw-3rem))]' : 'sm:w-[min(32rem,calc(100vw-3rem))]'
-          }`}
+          dir={i18n.dir()}
+          className={cn(
+            'fixed inset-x-4 top-1/2 z-50 max-h-[90dvh] -translate-y-1/2 overflow-y-auto rounded-2xl bg-surface p-6 shadow-xl animate-scale-in focus:outline-none',
+            'sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2',
+            'rtl:sm:left-auto rtl:sm:right-1/2 rtl:sm:translate-x-1/2 rtl:sm:-translate-x-1/2',
+            size === 'lg'
+              ? 'sm:w-[min(48rem,calc(100vw-3rem))]'
+              : 'sm:w-[min(32rem,calc(100vw-3rem))]'
+          )}
         >
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <Dialog.Title className="text-lg font-semibold text-primary-900">{title}</Dialog.Title>
+              <Dialog.Title className="text-lg font-semibold text-primary-900">
+                {title}
+              </Dialog.Title>
               {description && (
-                <Dialog.Description className="mt-1 text-sm text-neutral-600">{description}</Dialog.Description>
+                <Dialog.Description className="mt-1 text-sm text-app-secondary">
+                  {description}
+                </Dialog.Description>
               )}
             </div>
             <Dialog.Close

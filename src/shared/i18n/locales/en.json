@@ -46,6 +46,13 @@
   },
   "nav": {
     "primary": "Primary navigation",
+    "sections": {
+      "main": "Overview",
+      "organization": "Organization",
+      "sales": "Sales & Performance",
+      "admin": "Administration",
+      "account": "Account"
+    },
     "dashboard": "Dashboard",
     "companies": "Companies",
     "branches": "Branches",
@@ -209,11 +216,18 @@
     "statBranches": "Branches",
     "statTeams": "Teams",
     "platformTitle": "Platform overview",
+    "platformSubtitle": "Monitor companies, managers and employees across the platform.",
     "platformCompanies": "Companies",
     "platformCompanyAdmins": "Company managers",
     "platformEmployees": "Registered employees",
     "platformPendingRequests": "Pending password requests",
-    "platformRecentApproved": "Approved in the last 7 days"
+    "platformRecentApproved": "Approved in the last 7 days",
+    "quickActions": "Quick actions",
+    "recentActivity": "Recent activity",
+    "noActivity": "No recent activity to show.",
+    "viewAll": "View all",
+    "overviewCard": "Company snapshot",
+    "overviewCardBody": "A live summary of your workforce and sales activity."
   },
   "states": {
     "noPermissionTitle": "You do not have access to this",

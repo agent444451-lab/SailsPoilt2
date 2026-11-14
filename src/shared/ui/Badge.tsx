@@ -11,12 +11,21 @@ const TONE_CLASSES: Record<BadgeTone, string> = {
   error: 'bg-error-50 text-error-700 ring-error-100',
 };
 
-export function Badge({ tone = 'neutral', children }: { tone?: BadgeTone; children: ReactNode }) {
+export function Badge({
+  tone = 'neutral',
+  children,
+  className,
+}: {
+  tone?: BadgeTone;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset',
-        TONE_CLASSES[tone]
+        'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset',
+        TONE_CLASSES[tone],
+        className
       )}
     >
       {children}

@@ -1,10 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: ['class', '[data-appearance="dark"]'],
   theme: {
     extend: {
       fontFamily: {
         sans: ['Inter', '"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
+        display: ['Inter', '"IBM Plex Sans Arabic"', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
+      },
+      fontSize: {
+        '2xs': ['0.6875rem', { lineHeight: '1rem', letterSpacing: '0.01em' }],
+      },
+      letterSpacing: {
+        tightest: '-0.04em',
       },
       colors: {
         primary: {
@@ -47,30 +56,40 @@ export default {
           50: '#ECFDF3',
           100: '#D1FADF',
           200: '#A6F4C5',
+          300: '#6CE9A6',
+          400: '#32D583',
           500: '#12B76A',
           600: '#079455',
           700: '#067647',
           800: '#085D3A',
+          900: '#054331',
         },
         warning: {
           50: '#FFFAEB',
           100: '#FEF0C7',
           200: '#FEDF89',
+          300: '#FEC84B',
+          400: '#FDB022',
           500: '#F79009',
           600: '#DC6803',
           700: '#B54708',
           800: '#93370D',
+          900: '#7A2E0E',
         },
         error: {
           50: '#FEF3F2',
           100: '#FEE4E2',
           200: '#FECDCA',
+          300: '#FDA29B',
+          400: '#F97066',
           500: '#F04438',
           600: '#D92D20',
           700: '#B42318',
           800: '#912018',
+          900: '#7A271A',
         },
         neutral: {
+          25: '#FAFBFC',
           50: '#F7F8FA',
           100: '#EEF1F5',
           200: '#DDE2EA',
@@ -81,16 +100,73 @@ export default {
           700: '#374151',
           800: '#1F2937',
           900: '#111827',
+          950: '#030712',
         },
+      },
+      boxShadow: {
+        'xs': '0 1px 2px 0 rgb(0 0 0 / 0.04)',
+        'sm': '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px 0 rgb(0 0 0 / 0.04)',
+        'md': '0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+        'lg': '0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04)',
+        'xl': '0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04)',
+        'glow': '0 0 0 3px var(--tw-shadow-color, rgb(47 111 237 / 0.15))',
+        'sidebar': '4px 0 12px -2px rgb(0 0 0 / 0.08)',
+      },
+      borderRadius: {
+        '2xl': '1rem',
+        '3xl': '1.25rem',
       },
       keyframes: {
         'sheet-up': {
           from: { transform: 'translateY(100%)' },
           to: { transform: 'translateY(0)' },
         },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'fade-in-up': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-in-down': {
+          from: { opacity: '0', transform: 'translateY(-8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'scale-in': {
+          from: { opacity: '0', transform: 'scale(0.97)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        'slide-in-right': {
+          from: { opacity: '0', transform: 'translateX(12px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        'shimmer': {
+          '100%': { transform: 'translateX(100%)' },
+        },
+        'pulse-ring': {
+          '0%': { boxShadow: '0 0 0 0 rgb(47 111 237 / 0.4)' },
+          '70%': { boxShadow: '0 0 0 8px rgb(47 111 237 / 0)' },
+          '100%': { boxShadow: '0 0 0 0 rgb(47 111 237 / 0)' },
+        },
       },
       animation: {
-        'sheet-up': 'sheet-up 220ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'sheet-up': 'sheet-up 280ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'fade-in': 'fade-in 200ms ease-out',
+        'fade-in-up': 'fade-in-up 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'fade-in-down': 'fade-in-down 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'scale-in': 'scale-in 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'slide-in-right': 'slide-in-right 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+        'shimmer': 'shimmer 2s infinite',
+        'pulse-ring': 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      transitionTimingFunction: {
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'in-out-quart': 'cubic-bezier(0.76, 0, 0.24, 1)',
+      },
+      transitionDuration: {
+        '250': '250ms',
+        '350': '350ms',
       },
     },
   },
