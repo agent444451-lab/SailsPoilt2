@@ -15,9 +15,11 @@ import {
 import { Badge } from '@/shared/ui/Badge';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { Field, inputClass } from '@/shared/ui/Field';
+import { Alert } from '@/shared/ui/Alert';
 import { Modal } from '@/shared/ui/Modal';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Skeleton } from '@/shared/ui/Skeleton';
@@ -59,35 +61,35 @@ export function RanksPage() {
       ) : (
         <div className="grid gap-5 xl:grid-cols-2">
           {ranks.map((rank) => (
-            <Card key={rank.id} className="p-5">
+            <Card key={rank.id} interactive className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-700">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-700 transition-transform hover:scale-110">
                     <Shield className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <div className="min-w-0">
                     <h2 className="truncate text-lg font-semibold text-primary-900">{rank.name}</h2>
-                    {rank.nameAr && <p className="text-xs text-neutral-600" dir="auto">{rank.nameAr}</p>}
+                    {rank.nameAr && <p className="text-xs text-neutral-500" dir="auto">{rank.nameAr}</p>}
                     <p className="mt-1 text-xs font-medium text-accent-700">{t(`ranksPage.scope.${rank.scope}`)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => setEditing(rank)} aria-label={t('common.save')}>
-                    <Pencil className="h-4 w-4" aria-hidden="true" />
+                  <Button variant="ghost" size="sm" onClick={() => setEditing(rank)} aria-label={t('common.edit')}>
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setDeleting(rank)}
                     className="text-error-700 hover:bg-error-50"
-                    aria-label={t('roster.actions.remove')}
+                    aria-label={t('common.delete')}
                   >
-                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
                 </div>
               </div>
               {rank.permissions.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2 border-t border-neutral-100 pt-4">
+                <div className="mt-4 flex flex-wrap gap-2 border-t border-app-soft pt-4">
                   {rank.permissions.map((perm) => (
                     <Badge key={perm} tone="info">
                       {t(`ranksPage.permissions.${perm}`, { defaultValue: perm })}
@@ -134,20 +136,25 @@ function PermissionSelector({
   };
   return (
     <div className="grid gap-2 sm:grid-cols-2">
-      {RANK_PERMISSIONS.map((perm) => (
-        <label
-          key={perm}
-          className="flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm cursor-pointer transition-colors hover:bg-neutral-50"
-        >
-          <input
-            type="checkbox"
-            checked={selected.includes(perm)}
-            onChange={() => toggle(perm)}
-            className="h-4 w-4 rounded border-neutral-300 text-accent-600 focus:ring-accent-500"
-          />
-          <span className="text-primary-900">{t(`ranksPage.permissions.${perm}`, { defaultValue: perm })}</span>
-        </label>
-      ))}
+      {RANK_PERMISSIONS.map((perm) => {
+        const isChecked = selected.includes(perm);
+        return (
+          <label
+            key={perm}
+            className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm cursor-pointer transition-all ${
+              isChecked ? 'border-accent-200 bg-accent-50/50' : 'border-app-soft hover:bg-neutral-50'
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={isChecked}
+              onChange={() => toggle(perm)}
+              className="h-4 w-4 rounded border-neutral-300 text-accent-600 focus:ring-accent-500"
+            />
+            <span className="text-primary-900">{t(`ranksPage.permissions.${perm}`, { defaultValue: perm })}</span>
+          </label>
+        );
+      })}
     </div>
   );
 }
@@ -164,7 +171,7 @@ function ScopeSelector({
   const isSpecific = scope === 'specific';
   return (
     <div className="flex flex-col gap-3">
-      <div className={`flex items-center justify-between gap-3 rounded-lg border border-neutral-200 px-3 py-2.5 text-sm transition-colors ${isSpecific ? 'opacity-50' : 'cursor-pointer hover:bg-neutral-50'}`}>
+      <div className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors ${isSpecific ? 'border-app-soft opacity-50' : 'border-app-soft cursor-pointer hover:bg-neutral-50'}`}>
         <span className="text-primary-900">{t('ranksPage.applyToAll')}</span>
         <button
           type="button"
@@ -174,7 +181,7 @@ function ScopeSelector({
           onClick={() => onChange(isCompany ? 'branch' : 'company')}
           className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${isCompany ? 'bg-accent-600' : 'bg-neutral-300'}`}
         >
-          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isCompany ? 'translate-x-6 rtl:-translate-x-6' : 'translate-x-1 rtl:-translate-x-1'}`} />
+          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${isCompany ? 'translate-x-6 rtl:-translate-x-6' : 'translate-x-1 rtl:-translate-x-1'}`} />
         </button>
       </div>
       <label className="flex items-center gap-2 text-sm text-primary-900 cursor-pointer">
@@ -208,18 +215,21 @@ function MemberPicker({
     return <p className="text-sm text-neutral-500">{t('ranksPage.noMembers')}</p>;
   }
   return (
-    <div className="max-h-48 overflow-y-auto rounded-lg border border-neutral-200 p-2">
-      {members.map((m) => (
-        <label key={m.id} className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer rounded hover:bg-neutral-50">
-          <input
-            type="checkbox"
-            checked={selected.includes(m.id)}
-            onChange={() => toggle(m.id)}
-            className="h-4 w-4 rounded border-neutral-300 text-accent-600 focus:ring-accent-500"
-          />
-          <span className="text-primary-900" dir="auto">{m.fullNameEn}</span>
-        </label>
-      ))}
+    <div className="max-h-48 overflow-y-auto rounded-lg border border-app-soft p-2">
+      {members.map((m) => {
+        const isChecked = selected.includes(m.id);
+        return (
+          <label key={m.id} className={`flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer rounded transition-colors ${isChecked ? 'bg-accent-50/50' : 'hover:bg-neutral-50'}`}>
+            <input
+              type="checkbox"
+              checked={isChecked}
+              onChange={() => toggle(m.id)}
+              className="h-4 w-4 rounded border-neutral-300 text-accent-600 focus:ring-accent-500"
+            />
+            <span className="text-primary-900" dir="auto">{m.fullNameEn}</span>
+          </label>
+        );
+      })}
     </div>
   );
 }
@@ -317,45 +327,29 @@ function RankDialog({
         noValidate
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field id="rank-name" label={t('ranksPage.fieldName')}>
-            <input
-              id="rank-name"
-              className={inputClass}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={mutation.isPending}
-              autoFocus
-            />
+          <Field id="rank-name" label={t('ranksPage.fieldName')} required>
+            <input id="rank-name" className={inputClass} value={name} onChange={(e) => setName(e.target.value)} disabled={mutation.isPending} autoFocus />
           </Field>
           <Field id="rank-name-ar" label={t('ranksPage.fieldNameAr')}>
-            <input
-              id="rank-name-ar"
-              className={inputClass}
-              value={nameAr}
-              onChange={(e) => setNameAr(e.target.value)}
-              disabled={mutation.isPending}
-              dir="auto"
-            />
+            <input id="rank-name-ar" className={inputClass} value={nameAr} onChange={(e) => setNameAr(e.target.value)} disabled={mutation.isPending} dir="auto" />
           </Field>
         </div>
         <div>
-          <p className="mb-2 text-sm font-medium text-primary-900">{t('ranksPage.permissionsLabel')}</p>
+          <p className="mb-2.5 text-sm font-medium text-primary-900">{t('ranksPage.permissionsLabel')}</p>
           <PermissionSelector selected={permissions} onChange={setPermissions} />
         </div>
-        <div className="border-t border-neutral-200 pt-4">
+        <div className="border-t border-app-soft pt-5">
           <p className="mb-3 text-sm font-medium text-primary-900">{t('ranksPage.scopeLabel')}</p>
           <ScopeSelector scope={scope} onChange={setScope} />
           {scope === 'specific' && (
             <div className="mt-3">
-              <p className="mb-2 text-xs text-neutral-600">{t('ranksPage.specificHint')}</p>
+              <p className="mb-2 text-xs text-neutral-500">{t('ranksPage.specificHint')}</p>
               <MemberPicker members={allMembers} selected={memberIds} onChange={setMemberIds} />
             </div>
           )}
         </div>
         {mutation.isError && (
-          <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
-            {t('ranksPage.saveFailed')}
-          </p>
+          <Alert tone="error">{t('ranksPage.saveFailed')}</Alert>
         )}
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button variant="secondary" type="button" onClick={() => handleClose(false)} disabled={mutation.isPending}>
@@ -391,25 +385,16 @@ function DeleteRankDialog({
   };
 
   return (
-    <Modal open={rank !== null} onOpenChange={onOpenChange} title={t('ranksPage.deleteTitle')}>
-      <div className="flex flex-col gap-4">
-        <p className="text-sm text-neutral-700">
-          {t('ranksPage.deleteConfirm', { name: rank?.name ?? '' })}
-        </p>
-        {deleteMutation.isError && (
-          <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
-            {t('ranksPage.deleteFailed')}
-          </p>
-        )}
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={deleteMutation.isPending}>
-            {t('common.cancel')}
-          </Button>
-          <Button variant="danger" onClick={() => void confirm()} disabled={deleteMutation.isPending}>
-            {deleteMutation.isPending ? t('roster.remove.removing') : t('roster.actions.remove')}
-          </Button>
-        </div>
-      </div>
-    </Modal>
+    <ConfirmDialog
+      open={rank !== null}
+      onOpenChange={onOpenChange}
+      title={t('ranksPage.deleteTitle')}
+      description={t('ranksPage.deleteConfirm', { name: rank?.name ?? '' })}
+      confirmLabel={t('common.delete')}
+      pending={deleteMutation.isPending}
+      error={deleteMutation.isError}
+      errorLabel={t('ranksPage.deleteFailed')}
+      onConfirm={() => void confirm()}
+    />
   );
 }

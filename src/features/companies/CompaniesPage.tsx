@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Plus, Shield } from 'lucide-react';
+import { Building2, CheckCircle2, Plus, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { useRosterList, useCreateCompanyWithAdmin, useAddCompanyAssistant } from '@/features/roster/useRoster';
@@ -11,6 +11,7 @@ import { Card } from '@/shared/ui/Card';
 import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { Field, inputClass } from '@/shared/ui/Field';
+import { Alert } from '@/shared/ui/Alert';
 import { Modal } from '@/shared/ui/Modal';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Skeleton } from '@/shared/ui/Skeleton';
@@ -43,13 +44,13 @@ export function CompaniesPage() {
       />
 
       {companies.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <Card>
           <EmptyState
             icon={<Building2 className="h-7 w-7" aria-hidden="true" />}
             title={t('companies.emptyTitle')}
             body={t('companies.emptyBody')}
           />
-        </div>
+        </Card>
       ) : (
         <div className="grid gap-5 xl:grid-cols-2">
           {companies.map((company) => {
@@ -58,45 +59,46 @@ export function CompaniesPage() {
             );
             const companyMembers = members.filter((m) => m.companyId === company.id);
             return (
-              <Card key={company.id} className="p-5">
+              <Card key={company.id} interactive className="p-5">
                 <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-700">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-700 transition-transform hover:scale-110">
                     <Building2 className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate text-lg font-semibold text-primary-900">{company.name}</h2>
                     {company.trade_license && (
-                      <p className="text-xs text-neutral-600" dir="ltr">
+                      <p className="text-xs text-neutral-500" dir="ltr">
                         {t('companies.tradeLicense')}: {company.trade_license}
                       </p>
                     )}
-                    <p className="mt-1 text-xs text-neutral-600">
+                    <p className="mt-1 text-xs text-neutral-500">
                       {t('companies.membersCount', { count: companyMembers.length })}
                     </p>
                   </div>
                 </div>
                 {companyAdmins.length > 0 && (
-                  <div className="mt-4 border-t border-neutral-100 pt-4">
+                  <div className="mt-4 border-t border-app-soft pt-4">
                     <div className="mb-2 flex items-center justify-between">
                       <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
                         {t('companies.admins')}
                       </p>
                       {member && member.role === 'OWNER' && (
                         <Button variant="ghost" size="sm" onClick={() => setAssistantCompany({ id: company.id, name: company.name })}>
+                          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                           {t('companies.addAssistant')}
                         </Button>
                       )}
                     </div>
                     <div className="flex flex-col gap-2">
                       {companyAdmins.map((admin) => (
-                        <div key={admin.id} className="flex items-center justify-between gap-3">
+                        <div key={admin.id} className="flex items-center justify-between gap-3 rounded-lg px-2.5 py-2 transition-colors hover:bg-neutral-50">
                           <div className="flex items-center gap-2">
                             <Shield className="h-4 w-4 text-success-600" aria-hidden="true" />
                             <span className="text-sm font-medium text-primary-900" dir="auto">
                               {admin.fullNameEn}
                             </span>
                           </div>
-                          <Badge tone="success">{t('roles.COMPANY_ADMIN')}</Badge>
+                          <Badge tone="success" dot>{t('roles.COMPANY_ADMIN')}</Badge>
                         </div>
                       ))}
                     </div>
@@ -178,25 +180,30 @@ function AddCompanyDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
     return (
       <Modal open={open} onOpenChange={handleClose} size="md" title={t('companies.addSuccessTitle')}>
         <div className="flex flex-col gap-4">
-          <p role="status" className="rounded-lg bg-success-50 px-3 py-2 text-sm text-success-700">
-            {t('companies.addSuccessBody', { company: companyName })}
-          </p>
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-            <p className="text-sm text-neutral-700">
-              <span className="font-medium">{t('companies.adminEmail')}:</span>{' '}
-              <span dir="ltr">{success.email}</span>
-            </p>
-            <p className="text-sm text-neutral-700">
-              <span className="font-medium">{t('companies.adminUserId')}:</span>{' '}
-              <span dir="ltr" className="font-mono">{success.userId}</span>
-            </p>
+          <Alert tone="success">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+              {t('companies.addSuccessBody', { company: companyName })}
+            </div>
+          </Alert>
+          <div className="rounded-xl border border-app-soft bg-neutral-50/60 p-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-neutral-500">{t('companies.adminEmail')}</span>
+                <span className="font-medium text-primary-900" dir="ltr">{success.email}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-neutral-500">{t('companies.adminUserId')}</span>
+                <span className="font-mono font-medium text-primary-900" dir="ltr">{success.userId}</span>
+              </div>
+            </div>
             {provisionError && (
-              <p role="alert" className="mt-2 rounded-lg bg-warning-50 px-3 py-2 text-sm text-warning-700">
+              <Alert tone="warning" className="mt-3">
                 {t('companies.provisionWarning')}
-              </p>
+              </Alert>
             )}
           </div>
-          <p className="text-xs text-neutral-600">{t('companies.firstLoginNote')}</p>
+          <p className="text-xs text-neutral-500 leading-relaxed">{t('companies.firstLoginNote')}</p>
           <Button variant="secondary" onClick={() => handleClose(false)} className="w-full sm:w-auto sm:self-end">
             {t('common.close')}
           </Button>
@@ -222,83 +229,34 @@ function AddCompanyDialog({ open, onOpenChange }: { open: boolean; onOpenChange:
         className="flex flex-col gap-5"
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field id="company-name" label={t('companies.fieldCompanyName')}>
-            <input
-              id="company-name"
-              className={inputClass}
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              disabled={mutation.isPending}
-            />
+          <Field id="company-name" label={t('companies.fieldCompanyName')} required>
+            <input id="company-name" className={inputClass} value={companyName} onChange={(e) => setCompanyName(e.target.value)} disabled={mutation.isPending} autoFocus />
           </Field>
           <Field id="trade-license" label={t('companies.fieldTradeLicense')}>
-            <input
-              id="trade-license"
-              className={inputClass}
-              value={tradeLicense}
-              onChange={(e) => setTradeLicense(e.target.value)}
-              disabled={mutation.isPending}
-              dir="ltr"
-            />
+            <input id="trade-license" className={inputClass} value={tradeLicense} onChange={(e) => setTradeLicense(e.target.value)} disabled={mutation.isPending} dir="ltr" />
           </Field>
         </div>
 
-        <div className="border-t border-neutral-200 pt-4">
+        <div className="border-t border-app-soft pt-5">
           <p className="mb-4 text-sm font-semibold text-primary-900">{t('companies.adminSection')}</p>
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field id="admin-name" label={t('companies.fieldAdminName')}>
-              <input
-                id="admin-name"
-                className={inputClass}
-                value={adminName}
-                onChange={(e) => setAdminName(e.target.value)}
-                disabled={mutation.isPending}
-              />
+            <Field id="admin-name" label={t('companies.fieldAdminName')} required>
+              <input id="admin-name" className={inputClass} value={adminName} onChange={(e) => setAdminName(e.target.value)} disabled={mutation.isPending} />
             </Field>
             <Field id="admin-name-ar" label={t('companies.fieldAdminNameAr')}>
-              <input
-                id="admin-name-ar"
-                className={inputClass}
-                value={adminNameAr}
-                onChange={(e) => setAdminNameAr(e.target.value)}
-                disabled={mutation.isPending}
-                dir="auto"
-              />
+              <input id="admin-name-ar" className={inputClass} value={adminNameAr} onChange={(e) => setAdminNameAr(e.target.value)} disabled={mutation.isPending} dir="auto" />
             </Field>
-            <Field id="admin-email" label={t('companies.fieldAdminEmail')}>
-              <input
-                id="admin-email"
-                type="email"
-                className={inputClass}
-                value={adminEmail}
-                onChange={(e) => setAdminEmail(e.target.value)}
-                disabled={mutation.isPending}
-                dir="ltr"
-              />
+            <Field id="admin-email" label={t('companies.fieldAdminEmail')} required>
+              <input id="admin-email" type="email" className={inputClass} value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} disabled={mutation.isPending} dir="ltr" />
             </Field>
-            <Field
-              id="admin-password"
-              label={t('companies.fieldAdminPassword')}
-              hint={t('companies.passwordHint')}
-            >
-              <input
-                id="admin-password"
-                type="password"
-                className={inputClass}
-                value={adminPassword}
-                onChange={(e) => setAdminPassword(e.target.value)}
-                disabled={mutation.isPending}
-                dir="ltr"
-                autoComplete="new-password"
-              />
+            <Field id="admin-password" label={t('companies.fieldAdminPassword')} hint={t('companies.passwordHint')} required>
+              <input id="admin-password" type="password" className={inputClass} value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} disabled={mutation.isPending} dir="ltr" autoComplete="new-password" />
             </Field>
           </div>
         </div>
 
         {mutation.isError && (
-          <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
-            {t('companies.addFailed')}
-          </p>
+          <Alert tone="error">{t('companies.addFailed')}</Alert>
         )}
 
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -375,19 +333,27 @@ function AddAssistantDialog({
     return (
       <Modal open={company !== null} onOpenChange={handleClose} size="md" title={t('companies.assistantSuccess')}>
         <div className="flex flex-col gap-4">
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-            <p className="text-sm text-neutral-700">
-              <span className="font-medium">{t('companies.assistantEmail')}:</span>{' '}
-              <span dir="ltr">{success.email}</span>
-            </p>
-            <p className="text-sm text-neutral-700">
-              <span className="font-medium">{t('companies.assistantUserId')}:</span>{' '}
-              <span dir="ltr" className="font-mono">{success.userId}</span>
-            </p>
+          <Alert tone="success">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+              {t('companies.assistantSuccess')}
+            </div>
+          </Alert>
+          <div className="rounded-xl border border-app-soft bg-neutral-50/60 p-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-neutral-500">{t('companies.assistantEmail')}</span>
+                <span className="font-medium text-primary-900" dir="ltr">{success.email}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-neutral-500">{t('companies.assistantUserId')}</span>
+                <span className="font-mono font-medium text-primary-900" dir="ltr">{success.userId}</span>
+              </div>
+            </div>
             {provisionError && (
-              <p role="alert" className="mt-2 rounded-lg bg-warning-50 px-3 py-2 text-sm text-warning-700">
+              <Alert tone="warning" className="mt-3">
                 {t('companies.provisionWarning')}
-              </p>
+              </Alert>
             )}
           </div>
           <Button variant="secondary" onClick={() => handleClose(false)} className="w-full sm:w-auto sm:self-end">
@@ -415,23 +381,21 @@ function AddAssistantDialog({
         className="flex flex-col gap-5"
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field id="assistant-name" label={t('companies.assistantName')}>
+          <Field id="assistant-name" label={t('companies.assistantName')} required>
             <input id="assistant-name" className={inputClass} value={name} onChange={(e) => setName(e.target.value)} disabled={mutation.isPending} autoFocus />
           </Field>
           <Field id="assistant-name-ar" label={t('companies.assistantNameAr')}>
             <input id="assistant-name-ar" className={inputClass} value={nameAr} onChange={(e) => setNameAr(e.target.value)} disabled={mutation.isPending} dir="auto" />
           </Field>
-          <Field id="assistant-email" label={t('companies.assistantEmail')}>
+          <Field id="assistant-email" label={t('companies.assistantEmail')} required>
             <input id="assistant-email" type="email" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} disabled={mutation.isPending} dir="ltr" />
           </Field>
-          <Field id="assistant-password" label={t('companies.assistantPassword')} hint={t('companies.passwordHint')}>
+          <Field id="assistant-password" label={t('companies.assistantPassword')} hint={t('companies.passwordHint')} required>
             <input id="assistant-password" type="password" className={inputClass} value={password} onChange={(e) => setPassword(e.target.value)} disabled={mutation.isPending} dir="ltr" autoComplete="new-password" />
           </Field>
         </div>
         {mutation.isError && (
-          <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
-            {t('companies.assistantFailed')}
-          </p>
+          <Alert tone="error">{t('companies.assistantFailed')}</Alert>
         )}
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button variant="secondary" type="button" onClick={() => handleClose(false)} disabled={mutation.isPending}>

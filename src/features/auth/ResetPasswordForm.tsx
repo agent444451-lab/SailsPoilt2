@@ -4,7 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui/Button';
-import { Field, inputClass } from '@/shared/ui/Field';
+import { Field, inputClass, inputErrorClass } from '@/shared/ui/Field';
+import { Alert } from '@/shared/ui/Alert';
+import { Spinner } from '@/shared/ui/Spinner';
 import { useAuth } from '@/features/auth/useAuth';
 import {
   checkResetContext,
@@ -26,12 +28,6 @@ const schema = z
 type ResetPasswordValues = z.infer<typeof schema>;
 
 type ResetStatus = 'checking' | 'available' | 'unavailable' | 'submitting' | 'error';
-
-const RESET_ERROR_CODES = new Set([
-  'invalid_reset_token',
-  'firebase_update_failed',
-  'firebase_not_configured',
-]);
 
 export function ResetPasswordForm({ onExit }: { onExit: () => void }) {
   const { t } = useTranslation();
@@ -97,7 +93,10 @@ export function ResetPasswordForm({ onExit }: { onExit: () => void }) {
 
   if (status === 'checking') {
     return (
-      <p className="text-center text-sm text-neutral-600">{t('common.loading')}</p>
+      <div className="flex flex-col items-center gap-3 py-10">
+        <Spinner className="h-6 w-6" />
+        <p className="text-sm text-neutral-600">{t('common.loading')}</p>
+      </div>
     );
   }
 
@@ -112,13 +111,14 @@ export function ResetPasswordForm({ onExit }: { onExit: () => void }) {
         label={t('auth.changePassword.newPassword')}
         hint={t('auth.changePassword.hint')}
         error={errors.password && t('auth.errors.passwordInvalid')}
+        required
       >
         <input
           id="reset-new-password"
           type="password"
           autoComplete="new-password"
           dir="ltr"
-          className={inputClass}
+          className={errors.password ? inputErrorClass : inputClass}
           {...register('password')}
         />
       </Field>
@@ -126,18 +126,21 @@ export function ResetPasswordForm({ onExit }: { onExit: () => void }) {
         id="reset-confirm-password"
         label={t('auth.changePassword.confirmPassword')}
         error={errors.confirm && t('auth.errors.passwordMismatch')}
+        required
       >
         <input
           id="reset-confirm-password"
           type="password"
           autoComplete="new-password"
           dir="ltr"
-          className={inputClass}
+          className={errors.confirm ? inputErrorClass : inputClass}
           {...register('confirm')}
         />
       </Field>
       {errorMsg && (
-        <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">{errorMsg}</p>
+        <Alert tone="error" onClose={() => { setErrorMsg(null); setStatus('available'); }}>
+          {errorMsg}
+        </Alert>
       )}
       <div className="flex flex-col gap-3">
         <Button type="submit" disabled={status === 'submitting'} className="w-full">

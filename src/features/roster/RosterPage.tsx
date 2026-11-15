@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Search, Upload, Users } from 'lucide-react';
+import { Upload, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/features/auth/useAuth';
 import { Button } from '@/shared/ui/Button';
@@ -7,11 +7,12 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Skeleton } from '@/shared/ui/Skeleton';
-import { inputClass } from '@/shared/ui/Field';
+import { SearchBar } from '@/shared/ui/SearchBar';
+import { Card } from '@/shared/ui/Card';
 import type { RosterMember } from '@/features/roster/rosterApi';
 import type { EditMemberSaveFields } from '@/features/roster/EditMemberDialog';
 import { useRemoveRosterMember, useRanks, useRosterList, useUpdateRosterMember } from '@/features/roster/useRoster';
-import { RosterTable } from '@/features/roster/RosterTable';
+import { RosterTable, RosterEmptyResult } from '@/features/roster/RosterTable';
 import { EditMemberDialog } from '@/features/roster/EditMemberDialog';
 import { RemoveMemberDialog } from '@/features/roster/RemoveMemberDialog';
 import { ImportRosterDialog } from '@/features/roster/ImportRosterDialog';
@@ -65,7 +66,7 @@ export function RosterPage() {
           status: fields.status,
           companyId: editing.companyId,
           branchId: fields.branchId,
-          teamId: editing.teamId,
+          teamId: fields.teamId,
           customRankId: fields.customRankId,
         },
       },
@@ -95,39 +96,37 @@ export function RosterPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-sm">
-            <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" aria-hidden="true" />
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder={t('roster.searchPlaceholder')}
-              aria-label={t('roster.searchPlaceholder')}
-              className={`${inputClass} ps-9`}
-            />
-          </div>
-          {roster && <p className="text-sm text-neutral-600">{t('roster.total', { count: roster.members.length })}</p>}
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder={t('roster.searchPlaceholder')}
+          />
+          {roster && (
+            <p className="text-sm text-neutral-500">
+              {t('common.showing')} <span className="font-medium text-primary-900">{visibleMembers.length}</span> {t('common.of')} {roster.members.length} {t('roster.total', { count: roster.members.length })}
+            </p>
+          )}
         </div>
 
         {rosterQuery.isPending && <RosterSkeleton />}
         {rosterQuery.isError && (
-          <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
+          <Card>
             <ErrorState onRetry={() => void rosterQuery.refetch()} />
-          </div>
+          </Card>
         )}
         {roster && roster.members.length === 0 && (
-          <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
+          <Card>
             <EmptyState
               icon={<Users className="h-7 w-7" aria-hidden="true" />}
               title={t('roster.emptyTitle')}
               body={t('roster.emptyBody')}
             />
-          </div>
+          </Card>
         )}
         {roster && roster.members.length > 0 && visibleMembers.length === 0 && (
-          <p className="rounded-2xl border border-neutral-200 bg-white px-6 py-10 text-center text-sm text-neutral-600 shadow-sm">
-            {t('roster.noMatches')}
-          </p>
+          <Card>
+            <RosterEmptyResult />
+          </Card>
         )}
         {visibleMembers.length > 0 && (
           <RosterTable
@@ -169,10 +168,11 @@ export function RosterPage() {
 function RosterSkeleton() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm" role="status">
+    <div className="flex flex-col gap-3 rounded-2xl border border-app bg-surface p-4 shadow-sm" role="status">
       <span className="sr-only">{t('common.loading')}</span>
+      <Skeleton className="h-10 w-full" />
       {Array.from({ length: 5 }, (_, index) => (
-        <Skeleton key={index} className="h-12 w-full" />
+        <Skeleton key={index} className="h-14 w-full" />
       ))}
     </div>
   );

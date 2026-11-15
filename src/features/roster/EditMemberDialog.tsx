@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui/Button';
-import { Field, inputClass } from '@/shared/ui/Field';
+import { Field, inputClass, inputErrorClass } from '@/shared/ui/Field';
+import { Alert } from '@/shared/ui/Alert';
 import { Modal } from '@/shared/ui/Modal';
 import type { RosterListResponse, RosterMember } from '@/features/roster/rosterApi';
 import type { CustomRank } from '@/features/roster/rosterApi';
@@ -63,11 +64,26 @@ export function EditMemberDialog({
   });
 
   return (
-    <Modal open={member !== null} onOpenChange={onOpenChange} size="lg" title={t('roster.edit.title')} description={t('roster.edit.description')}>
+    <Modal
+      open={member !== null}
+      onOpenChange={onOpenChange}
+      size="lg"
+      title={t('roster.edit.title')}
+      description={t('roster.edit.description')}
+    >
       <form onSubmit={handleSubmit(submit)} noValidate className="flex flex-col gap-5">
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field id="edit-name-en" label={t('roster.edit.nameEn')} error={errors.fullNameEn && t('roster.edit.nameRequired')}>
-            <input id="edit-name-en" className={inputClass} {...register('fullNameEn')} />
+          <Field
+            id="edit-name-en"
+            label={t('roster.edit.nameEn')}
+            error={errors.fullNameEn && t('roster.edit.nameRequired')}
+            required
+          >
+            <input
+              id="edit-name-en"
+              className={errors.fullNameEn ? inputErrorClass : inputClass}
+              {...register('fullNameEn')}
+            />
           </Field>
           <Field id="edit-name-ar" label={t('roster.edit.nameAr')}>
             <input id="edit-name-ar" dir="auto" className={inputClass} {...register('fullNameAr')} />
@@ -91,10 +107,14 @@ export function EditMemberDialog({
             </select>
           </Field>
         </div>
-        {error && <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">{t('roster.edit.saveFailed')}</p>}
+        {error && (
+          <Alert tone="error">{t('roster.edit.saveFailed')}</Alert>
+        )}
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button variant="secondary" type="button" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
-          <Button type="submit" disabled={pending}>{pending ? t('roster.edit.saving') : t('common.save')}</Button>
+          <Button type="submit" disabled={pending}>
+            {pending ? t('roster.edit.saving') : t('common.save')}
+          </Button>
         </div>
       </form>
     </Modal>

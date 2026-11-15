@@ -17,7 +17,21 @@
     "back": "رجوع",
     "all": "الكل",
     "none": "لا يوجد",
-    "unknown": "غير معروف"
+    "unknown": "غير معروف",
+    "filter": "تصفية",
+    "filterAll": "الكل",
+    "sortBy": "ترتيب حسب",
+    "page": "صفحة",
+    "of": "من",
+    "results": "نتيجة",
+    "showing": "عرض",
+    "clearFilters": "مسح الفلاتر",
+    "noData": "لا توجد بيانات",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "search": "بحث"
   },
   "topbar": {
     "demoBadge": "بيانات تجريبية",

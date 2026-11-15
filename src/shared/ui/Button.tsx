@@ -1,24 +1,27 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { cn } from '@/shared/utils/cn';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-type ButtonSize = 'md' | 'sm' | 'lg';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
+type ButtonSize = 'md' | 'sm' | 'lg' | 'icon';
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    'bg-primary-900 text-white shadow-sm hover:bg-primary-800 hover:shadow active:scale-[0.98] focus-visible:ring-accent-500',
+    'bg-primary-900 text-white shadow-sm hover:bg-primary-800 hover:shadow-md active:scale-[0.98] focus-visible:ring-accent-500',
   secondary:
     'bg-surface text-primary-900 border border-app shadow-xs hover:bg-neutral-50 hover:border-neutral-400 active:scale-[0.98] focus-visible:ring-accent-500',
   ghost:
     'bg-transparent text-primary-900 hover:bg-neutral-100 active:scale-[0.98] focus-visible:ring-accent-500',
   danger:
-    'bg-error-600 text-white shadow-sm hover:bg-error-700 hover:shadow active:scale-[0.98] focus-visible:ring-error-500',
+    'bg-error-600 text-white shadow-sm hover:bg-error-700 hover:shadow-md active:scale-[0.98] focus-visible:ring-error-500',
+  outline:
+    'bg-transparent text-primary-900 border border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 active:scale-[0.98] focus-visible:ring-accent-500',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
   lg: 'min-h-12 px-5 text-sm sm:min-h-11',
   md: 'min-h-11 px-4 text-sm sm:min-h-10',
   sm: 'min-h-9 px-3 text-xs',
+  icon: 'h-10 w-10 p-0',
 };
 
 export const Button = forwardRef<

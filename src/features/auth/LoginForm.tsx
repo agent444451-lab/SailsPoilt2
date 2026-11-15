@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui/Button';
-import { Field, inputClass } from '@/shared/ui/Field';
+import { Field, inputClass, inputErrorClass } from '@/shared/ui/Field';
+import { Alert } from '@/shared/ui/Alert';
 import { firebaseErrorCode } from '@/shared/auth/firebase';
 import { useAuth } from '@/features/auth/useAuth';
 
@@ -57,30 +58,40 @@ export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
-      <Field id="login-email" label={t('auth.signIn.email')} error={errors.email && t('auth.errors.emailInvalid')}>
+      <Field
+        id="login-email"
+        label={t('auth.signIn.email')}
+        error={errors.email && t('auth.errors.emailInvalid')}
+        required
+      >
         <input
           id="login-email"
           type="email"
           autoComplete="email"
           dir="ltr"
-          className={inputClass}
+          className={errors.email ? inputErrorClass : inputClass}
           {...register('email')}
         />
       </Field>
-      <Field id="login-password" label={t('auth.signIn.password')} error={errors.password && t('auth.errors.passwordRequired')}>
+      <Field
+        id="login-password"
+        label={t('auth.signIn.password')}
+        error={errors.password && t('auth.errors.passwordRequired')}
+        required
+      >
         <input
           id="login-password"
           type="password"
           autoComplete="current-password"
           dir="ltr"
-          className={inputClass}
+          className={errors.password ? inputErrorClass : inputClass}
           {...register('password')}
         />
       </Field>
       {failure && (
-        <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
+        <Alert tone="error" onClose={() => setFailure(null)}>
           {t(`auth.errors.${failure}`)}
-        </p>
+        </Alert>
       )}
       <Button type="submit" disabled={isSubmitting} className="w-full">
         {isSubmitting ? t('auth.signIn.submitting') : t('auth.signIn.submit')}

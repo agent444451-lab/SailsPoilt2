@@ -1,12 +1,23 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Bell, Check, CheckCheck, Clock, Trash2 } from 'lucide-react';
 import { useNotifications, useNotificationActions } from '@/features/notifications/useNotifications';
 import type { AppNotification } from '@/features/roster/rosterApi';
 import { usePreferences } from '@/shared/stores/preferences';
+import { Badge } from '@/shared/ui/Badge';
+import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import { ErrorState } from '@/shared/ui/ErrorState';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { Skeleton } from '@/shared/ui/Skeleton';
+import { cn } from '@/shared/utils/cn';
+
+const TYPE_ICON: Record<string, typeof Bell> = {
+  password_request_created: Clock,
+  password_request_approved: Check,
+  password_request_rejected: Trash2,
+};
 
 function NotificationRow({ item }: { item: AppNotification }) {
   const { t } = useTranslation();
@@ -14,6 +25,7 @@ function NotificationRow({ item }: { item: AppNotification }) {
   const navigate = useNavigate();
   const { markRead, remove } = useNotificationActions();
   const unread = item.read_at === null;
+  const Icon = TYPE_ICON[item.type] ?? Bell;
 
   const open = () => {
     if (unread) markRead.mutate(item.id);
@@ -21,49 +33,63 @@ function NotificationRow({ item }: { item: AppNotification }) {
   };
 
   return (
-    <li className={`flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between ${unread ? 'bg-accent-50/60' : ''}`}>
+    <li
+      className={cn(
+        'group flex flex-col gap-3 p-4 transition-colors sm:flex-row sm:items-center sm:justify-between',
+        unread && 'bg-accent-50/40'
+      )}
+    >
       <div className="flex min-w-0 items-start gap-3">
         <span
-          aria-hidden="true"
-          className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${unread ? 'bg-accent-600' : 'bg-transparent'}`}
-        />
-        <div className="min-w-0">
-          <p className={`text-sm text-primary-900 ${unread ? 'font-semibold' : 'font-medium'}`}>
-            {t(`notifications.types.${item.type}`, { defaultValue: item.title })}
-          </p>
-          {item.title && item.title !== t(`notifications.types.${item.type}`, { defaultValue: item.title }) && (
-            <p className="truncate text-sm text-neutral-700">{item.title}</p>
+          className={cn(
+            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors',
+            unread ? 'bg-accent-100 text-accent-700' : 'bg-neutral-100 text-neutral-400'
           )}
-          {item.body && <p className="truncate text-xs text-neutral-600">{item.body}</p>}
-          <p className="mt-1 text-xs text-neutral-500">{new Date(item.created_at).toLocaleString(language)}</p>
+        >
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <p className={cn('text-sm', unread ? 'font-semibold text-primary-900' : 'font-medium text-neutral-700')}>
+              {t(`notifications.types.${item.type}`, { defaultValue: item.title })}
+            </p>
+            {unread && <span className="h-2 w-2 shrink-0 rounded-full bg-accent-600" aria-hidden="true" />}
+          </div>
+          {item.title && item.title !== t(`notifications.types.${item.type}`, { defaultValue: item.title }) && (
+            <p className="truncate text-sm text-neutral-600">{item.title}</p>
+          )}
+          {item.body && <p className="truncate text-xs text-neutral-500">{item.body}</p>}
+          <p className="mt-1 text-xs text-neutral-400">
+            {new Date(item.created_at).toLocaleString(language, { dateStyle: 'medium', timeStyle: 'short' })}
+          </p>
         </div>
       </div>
-      <div className="flex shrink-0 gap-2">
+      <div className="flex shrink-0 gap-2 ps-12 sm:ps-0">
         {item.link_path && (
-          <button
-            type="button"
-            onClick={open}
-            className="min-h-11 rounded-lg bg-primary-900 px-4 text-sm font-medium text-white hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
-          >
+          <Button variant="outline" size="sm" onClick={open}>
             {t('notifications.open')}
-          </button>
+          </Button>
         )}
         {unread && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => markRead.mutate(item.id)}
-            className="min-h-11 rounded-lg border border-neutral-300 px-4 text-sm font-medium text-primary-900 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
+            className="text-accent-700 hover:bg-accent-50"
           >
-            {t('notifications.markRead')}
-          </button>
+            <Check className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">{t('notifications.markRead')}</span>
+          </Button>
         )}
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => remove.mutate(item.id)}
-          className="min-h-11 rounded-lg px-4 text-sm font-medium text-error-700 hover:bg-error-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
+          className="text-error-700 hover:bg-error-50"
         >
-          {t('notifications.delete')}
-        </button>
+          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+          <span className="hidden sm:inline">{t('notifications.delete')}</span>
+        </Button>
       </div>
     </li>
   );
@@ -81,28 +107,51 @@ export function NotificationsPage() {
     <>
       <PageHeader
         title={t('nav.notifications')}
+        description={t('sections.notifications.description')}
         actions={
           unreadCount > 0 ? (
-            <button
-              type="button"
-              onClick={() => markAllRead.mutate()}
-              className="min-h-11 rounded-lg border border-neutral-300 px-4 text-sm font-medium text-primary-900 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
-            >
+            <Button variant="secondary" onClick={() => markAllRead.mutate()}>
+              <CheckCheck className="h-4 w-4" aria-hidden="true" />
               {t('notifications.markAllRead')}
-            </button>
+            </Button>
           ) : undefined
         }
       />
-      <div className="mt-6">
-        {query.isError ? (
-          <ErrorState onRetry={() => void query.refetch()} />
-        ) : items === undefined ? (
-          <Skeleton className="h-24 w-full" />
-        ) : items.length === 0 ? (
-          <Card className="p-6 text-center text-sm text-neutral-600">{t('notifications.empty')}</Card>
-        ) : (
+
+      <div className="mt-6 flex flex-col gap-4">
+        {unreadCount > 0 && (
+          <div className="flex items-center gap-2 rounded-xl bg-accent-50 px-4 py-2.5 text-sm text-accent-700">
+            <Bell className="h-4 w-4" aria-hidden="true" />
+            <span>{unreadCount} {t('notifications.title')}</span>
+          </div>
+        )}
+
+        {query.isError && (
+          <Card>
+            <ErrorState onRetry={() => void query.refetch()} />
+          </Card>
+        )}
+
+        {items === undefined && !query.isError && (
+          <div className="flex flex-col gap-3 rounded-2xl border border-app bg-surface p-4 shadow-sm" role="status">
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+          </div>
+        )}
+
+        {items && items.length === 0 && (
+          <Card>
+            <EmptyState
+              icon={<Bell className="h-7 w-7" aria-hidden="true" />}
+              title={t('notifications.empty')}
+            />
+          </Card>
+        )}
+
+        {items && items.length > 0 && (
           <Card className="overflow-hidden p-0">
-            <ul className="divide-y divide-neutral-200">
+            <ul className="divide-y divide-app-soft">
               {items.map((item) => (
                 <NotificationRow key={item.id} item={item} />
               ))}

@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui/Button';
-import { Field, inputClass } from '@/shared/ui/Field';
+import { Field, inputClass, inputErrorClass } from '@/shared/ui/Field';
+import { Alert } from '@/shared/ui/Alert';
 import { useAuth } from '@/features/auth/useAuth';
 import { RosterError } from '@/features/roster/rosterApi';
 
@@ -55,13 +56,14 @@ export function ChangePasswordForm() {
           label={t('auth.changePassword.newPassword')}
           hint={t('auth.changePassword.hint')}
           error={errors.password && t('auth.errors.passwordInvalid')}
+          required
         >
           <input
             id="new-password"
             type="password"
             autoComplete="new-password"
             dir="ltr"
-            className={inputClass}
+            className={errors.password ? inputErrorClass : inputClass}
             {...register('password')}
           />
         </Field>
@@ -69,20 +71,21 @@ export function ChangePasswordForm() {
           id="confirm-password"
           label={t('auth.changePassword.confirmPassword')}
           error={errors.confirm && t('auth.errors.passwordMismatch')}
+          required
         >
           <input
             id="confirm-password"
             type="password"
             autoComplete="new-password"
             dir="ltr"
-            className={inputClass}
+            className={errors.confirm ? inputErrorClass : inputClass}
             {...register('confirm')}
           />
         </Field>
         {failure && (
-          <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
+          <Alert tone="error" onClose={() => setFailure(null)}>
             {failure === 'recentLogin' ? t('auth.errors.requiresRecentLogin') : failure === 'serviceDown' ? t('auth.errors.firebaseNotConfigured') : failure === 'updateFailed' ? t('auth.errors.firebaseUpdateFailed') : t('auth.errors.generic')}
-          </p>
+          </Alert>
         )}
         <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? t('auth.changePassword.submitting') : t('auth.changePassword.submit')}

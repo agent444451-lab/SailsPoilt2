@@ -3,6 +3,7 @@ import { Ban, Loader2, Mail, Target, UserX, WifiOff, type LucideIcon } from 'luc
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
+import { Alert } from '@/shared/ui/Alert';
 import { useAuth } from '@/features/auth/useAuth';
 import { usePreferences } from '@/shared/stores/preferences';
 import { LoginForm } from '@/features/auth/LoginForm';
@@ -48,7 +49,7 @@ export function AuthGate({ children }: { children: (member: RosterMember) => Rea
     case 'loading':
       return (
         <AuthShell>
-          <div role="status" className="flex justify-center py-10">
+          <div role="status" className="flex flex-col items-center gap-3 py-10">
             <Loader2 className="h-6 w-6 animate-spin text-accent-600" aria-hidden="true" />
             <span className="sr-only">{t('common.loading')}</span>
           </div>
@@ -126,15 +127,18 @@ function AuthShell({ title, description, children }: { title?: string; descripti
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-neutral-50 px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="mb-8 flex items-center justify-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-900 text-white">
-            <Target className="h-6 w-6" aria-hidden="true" />
+        <div className="mb-8 flex flex-col items-center gap-3">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-900 text-white shadow-lg">
+            <Target className="h-7 w-7" aria-hidden="true" />
           </span>
-          <span className="text-xl font-semibold text-primary-900">{t('app.name')}</span>
+          <div className="text-center">
+            <span className="text-xl font-bold text-primary-900">{t('app.name')}</span>
+            <p className="text-xs text-neutral-500">{t('app.tagline')}</p>
+          </div>
         </div>
         <Card className="p-6 sm:p-8">
-          {title && <h1 className="text-2xl font-semibold text-primary-900">{title}</h1>}
-          {description && <p className="mt-2 text-sm text-neutral-600">{description}</p>}
+          {title && <h1 className="text-2xl font-bold text-primary-900">{title}</h1>}
+          {description && <p className="mt-2 text-sm leading-relaxed text-neutral-600">{description}</p>}
           <div className={title ? 'mt-6' : undefined}>{children}</div>
         </Card>
       </div>
@@ -155,11 +159,13 @@ function StatusPanel({
 }) {
   return (
     <div className="flex flex-col items-center gap-4 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-50 text-accent-700">
+      <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-50 text-accent-700 ring-4 ring-accent-50/50">
         <Icon className="h-7 w-7" aria-hidden="true" />
       </span>
-      <h1 className="text-xl font-semibold text-primary-900">{title}</h1>
-      <p className="text-sm text-neutral-600">{body}</p>
+      <div className="flex flex-col gap-1.5">
+        <h1 className="text-xl font-semibold text-primary-900">{title}</h1>
+        <p className="text-sm leading-relaxed text-neutral-600">{body}</p>
+      </div>
       <div className="mt-2 w-full">{children}</div>
     </div>
   );
@@ -192,16 +198,10 @@ function VerifyPanel({ email }: { email: string }) {
   return (
     <StatusPanel icon={Mail} title={t('auth.verify.title')} body={t('auth.verify.body', { email })}>
       <div className="flex flex-col gap-3">
-        {notice && (
-          <p
-            role="status"
-            className={`rounded-lg px-3 py-2 text-sm ${
-              notice === 'resent' ? 'bg-success-50 text-success-700' : 'bg-warning-50 text-warning-700'
-            }`}
-          >
-            {t(`auth.verify.notices.${notice}`)}
-          </p>
-        )}
+        {notice === 'resent' && <Alert tone="success">{t('auth.verify.notices.resent')}</Alert>}
+        {notice === 'notYet' && <Alert tone="warning">{t('auth.verify.notices.notYet')}</Alert>}
+        {notice === 'resendFailed' && <Alert tone="error">{t('auth.verify.notices.resendFailed')}</Alert>}
+        {notice === 'checkFailed' && <Alert tone="error">{t('auth.verify.notices.checkFailed')}</Alert>}
         <Button onClick={() => void check()} disabled={busy} className="w-full">
           {t('auth.verify.check')}
         </Button>

@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui/Button';
-import { Field, inputClass } from '@/shared/ui/Field';
+import { Field, inputClass, inputErrorClass } from '@/shared/ui/Field';
+import { Alert } from '@/shared/ui/Alert';
 import { firebaseErrorCode } from '@/shared/auth/firebase';
 import { useAuth } from '@/features/auth/useAuth';
 import { checkPasswordRequestByEmail, createPasswordRequestByEmail, generateResetKey, sha256Hex, storeResetKey } from '@/features/roster/rosterApi';
@@ -77,33 +78,30 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
           id="reset-email"
           label={t('auth.signIn.email')}
           error={errors.email && t('auth.errors.emailInvalid')}
+          required
         >
           <input
             id="reset-email"
             type="email"
             autoComplete="email"
             dir="ltr"
-            className={inputClass}
+            className={errors.email ? inputErrorClass : inputClass}
             {...register('email')}
           />
         </Field>
         {status === 'sent' && (
-          <p role="status" className="rounded-lg bg-success-50 px-3 py-2 text-sm text-success-700">
-            {t('auth.forgot.sent')}
-          </p>
+          <Alert tone="success">{t('auth.forgot.sent')}</Alert>
         )}
         {status === 'requested' && (
-          <p role="status" className="rounded-lg bg-success-50 px-3 py-2 text-sm text-success-700">{t('auth.forgot.requested')}</p>
+          <Alert tone="success">{t('auth.forgot.requested')}</Alert>
         )}
         {status === 'pending' && (
-          <p role="status" className="rounded-lg bg-warning-50 px-3 py-3 text-sm text-warning-700">
-            {t('auth.forgot.pending')}
-          </p>
+          <Alert tone="warning">{t('auth.forgot.pending')}</Alert>
         )}
         {(status === 'network' || status === 'unknown') && (
-          <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
+          <Alert tone="error" onClose={() => setStatus('idle')}>
             {t(`auth.errors.${status}`)}
-          </p>
+          </Alert>
         )}
         <div className="grid gap-3 sm:grid-cols-2">
           <Button type="submit" disabled={isSubmitting || checking} className="w-full">

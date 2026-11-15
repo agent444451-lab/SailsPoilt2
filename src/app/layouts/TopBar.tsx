@@ -35,17 +35,15 @@ export function TopBar() {
           onClick={toggleSidebar}
           aria-label={collapsed ? t('topbar.expandSidebar') : t('topbar.collapseSidebar')}
           aria-expanded={!collapsed}
-          className="hidden h-10 w-10 items-center justify-center rounded-lg text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 lg:flex"
+          className="hidden h-10 w-10 items-center justify-center rounded-lg text-neutral-600 transition-all hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 lg:flex"
         >
           <ToggleIcon className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
         </button>
 
-        {/* Mobile logo */}
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-900 lg:hidden">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-900 shadow-sm lg:hidden">
           <Compass className="h-5 w-5 text-white" aria-hidden="true" />
         </span>
 
-        {/* Context label */}
         <div className="hidden min-w-0 items-center gap-2 sm:flex">
           {user && (
             <div className="min-w-0">

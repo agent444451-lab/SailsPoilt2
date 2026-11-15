@@ -19,6 +19,7 @@ import { getBrowserFingerprint } from '@/shared/utils/browserFingerprint';
 import { Button } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
 import { Field, inputClass } from '@/shared/ui/Field';
+import { Alert } from '@/shared/ui/Alert';
 import { PageHeader } from '@/shared/ui/PageHeader';
 
 const PASSWORD_PATTERN = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,12}$/;
@@ -107,7 +108,7 @@ export function ProfilePage() {
     try {
       await sendPasswordReset(member.email);
       setStatus('resetSent');
-    } catch (error) {
+    } catch {
       setStatus('error');
     }
   };
@@ -186,11 +187,11 @@ export function ProfilePage() {
             <Field id="profile-phone" label={t('profile.phone')}>
               <input id="profile-phone" value={phone} onChange={(event) => setPhone(event.target.value)} className={inputClass} dir="ltr" inputMode="tel" />
             </Field>
-            {status === 'saved' && <p role="status" className="rounded-lg bg-success-50 px-3 py-2 text-sm text-success-700">{t('profile.saved')}</p>}
+            {status === 'saved' && <Alert tone="success" onClose={() => setStatus('idle')}>{t('profile.saved')}</Alert>}
             {status === 'error' && saveError && (
-              <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
+              <Alert tone="error" onClose={() => { setStatus('idle'); setSaveError(null); }}>
                 {t(`profile.errors.${saveError}`)}
-              </p>
+              </Alert>
             )}
             <Button onClick={() => void save()} disabled={saving} className="w-full sm:w-auto sm:self-start">
               <Save className="h-4 w-4" aria-hidden="true" />
@@ -204,19 +205,15 @@ export function ProfilePage() {
             <KeyRound className="h-5 w-5" aria-hidden="true" />
           </span>
           <h2 className="mt-5 text-lg font-semibold text-primary-900">{t('profile.passwordTitle')}</h2>
-          <p className="mt-2 text-sm text-neutral-600">{t('profile.passwordDescription')}</p>
+          <p className="mt-2 text-sm leading-relaxed text-neutral-600">{t('profile.passwordDescription')}</p>
 
           {resetDone && (
-            <p role="status" className="mt-4 rounded-lg bg-success-50 px-3 py-3 text-sm text-success-700">
-              {t('profile.passwordChanged')}
-            </p>
+            <Alert tone="success" className="mt-4">{t('profile.passwordChanged')}</Alert>
           )}
 
           {resetAvailable && !resetDone && (
             <div className="mt-4 flex flex-col gap-3">
-              <p role="status" className="rounded-lg bg-success-50 px-3 py-2 text-sm text-success-700">
-                {t('profile.resetApproved')}
-              </p>
+              <Alert tone="success">{t('profile.resetApproved')}</Alert>
               <Field id="profile-new-password" label={t('auth.changePassword.newPassword')} hint={t('auth.changePassword.hint')}>
                 <input
                   id="profile-new-password"
@@ -240,9 +237,9 @@ export function ProfilePage() {
                 />
               </Field>
               {resetError && (
-                <p role="alert" className="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">
+                <Alert tone="error" onClose={() => setResetError(null)}>
                   {t(`profile.resetErrors.${resetError}`)}
-                </p>
+                </Alert>
               )}
               <Button onClick={() => void doResetPassword()} disabled={resetting} className="w-full">
                 {resetting ? t('auth.changePassword.submitting') : t('auth.changePassword.submit')}
@@ -253,19 +250,18 @@ export function ProfilePage() {
           {!resetAvailable && (
             <>
               {hasPending && (
-                <p role="status" className="mt-4 rounded-lg bg-warning-50 px-3 py-3 text-sm text-warning-700">
-                  {t('profile.pendingRequest')}
-                </p>
+                <Alert tone="warning" className="mt-4">{t('profile.pendingRequest')}</Alert>
               )}
-              {status === 'resetSent' && <p role="status" className="mt-4 rounded-lg bg-success-50 px-3 py-2 text-sm text-success-700">{t('profile.resetSent')}</p>}
-              {status === 'requestSent' && <p role="status" className="mt-4 rounded-lg bg-success-50 px-3 py-2 text-sm text-success-700">{t('profile.requestSent')}</p>}
-              {status === 'error' && <p role="alert" className="mt-4 rounded-lg bg-error-50 px-3 py-2 text-sm text-error-700">{t('profile.error')}</p>}
+              {status === 'resetSent' && <Alert tone="success" className="mt-4">{t('profile.resetSent')}</Alert>}
+              {status === 'requestSent' && <Alert tone="success" className="mt-4">{t('profile.requestSent')}</Alert>}
+              {status === 'pending' && <Alert tone="warning" className="mt-4">{t('profile.pendingRequest')}</Alert>}
+              {status === 'error' && <Alert tone="error" className="mt-4" onClose={() => setStatus('idle')}>{t('profile.error')}</Alert>}
               <div className="mt-6 flex flex-col gap-3">
                 <Button variant="secondary" onClick={() => void sendReset()} disabled={requestMutation.isPending} className="w-full">
                   {t('profile.sendReset')}
                 </Button>
                 {hasPending ? (
-                  <p className="rounded-lg bg-neutral-50 px-3 py-3 text-center text-sm text-neutral-600">
+                  <p className="rounded-lg bg-neutral-50 px-3 py-3 text-center text-sm text-neutral-500">
                     {t('profile.pendingRequest')}
                   </p>
                 ) : (

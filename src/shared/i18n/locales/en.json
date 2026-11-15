@@ -17,7 +17,21 @@
     "back": "Back",
     "all": "All",
     "none": "None",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "filter": "Filter",
+    "filterAll": "All",
+    "sortBy": "Sort by",
+    "page": "Page",
+    "of": "of",
+    "results": "results",
+    "showing": "Showing",
+    "clearFilters": "Clear filters",
+    "noData": "No data available",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search"
   },
   "topbar": {
     "demoBadge": "Demo Data",

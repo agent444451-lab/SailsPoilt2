@@ -44,14 +44,19 @@ export function OrganizationPage({ section }: { section: OrganizationSection }) 
 
 function CompaniesView({ companies, branches, teams, people }: OrganizationData) {
   const { t } = useTranslation();
-  if (companies.length === 0) return <EmptyState icon={<Building2 className="h-7 w-7" aria-hidden="true" />} title={t('organization.emptyCompanies')} body={t('organization.emptyBody')} />;
+  if (companies.length === 0) return <Card><EmptyState icon={<Building2 className="h-7 w-7" aria-hidden="true" />} title={t('organization.emptyCompanies')} body={t('organization.emptyBody')} /></Card>;
   return (
     <div className="grid gap-5 xl:grid-cols-2">
       {companies.map((company) => {
         const companyBranches = branches.filter((branch) => branch.company_id === company.id);
-        return <Card key={company.id} className="p-5"><Heading icon={<Building2 />} title={company.name} count={companyBranches.length} label={t('organization.branches')} />
-          <div className="mt-5 flex flex-col gap-3">{companyBranches.map((branch) => <BranchBlock key={branch.id} branch={branch} teams={teams} people={people} />)}</div>
-        </Card>;
+        return (
+          <Card key={company.id} interactive className="p-5">
+            <Heading icon={<Building2 />} title={company.name} count={companyBranches.length} label={t('organization.branches')} />
+            <div className="mt-5 flex flex-col gap-3">
+              {companyBranches.map((branch) => <BranchBlock key={branch.id} branch={branch} teams={teams} people={people} />)}
+            </div>
+          </Card>
+        );
       })}
     </div>
   );
@@ -59,14 +64,35 @@ function CompaniesView({ companies, branches, teams, people }: OrganizationData)
 
 function BranchesView({ companies, branches, teams, people }: OrganizationData) {
   const { t } = useTranslation();
-  if (branches.length === 0) return <EmptyState icon={<GitBranch className="h-7 w-7" aria-hidden="true" />} title={t('organization.emptyBranches')} body={t('organization.emptyBody')} />;
-  return <div className="grid gap-5 xl:grid-cols-2">{branches.map((branch) => <Card key={branch.id} className="p-5"><Heading icon={<GitBranch />} title={branch.name} count={people.filter((person) => person.branchId === branch.id).length} label={companies.find((company) => company.id === branch.company_id)?.name ?? ''} /><div className="mt-5 flex flex-col gap-3"><BranchBlock branch={branch} teams={teams} people={people} /></div></Card>)}</div>;
+  if (branches.length === 0) return <Card><EmptyState icon={<GitBranch className="h-7 w-7" aria-hidden="true" />} title={t('organization.emptyBranches')} body={t('organization.emptyBody')} /></Card>;
+  return (
+    <div className="grid gap-5 xl:grid-cols-2">
+      {branches.map((branch) => (
+        <Card key={branch.id} interactive className="p-5">
+          <Heading icon={<GitBranch />} title={branch.name} count={people.filter((person) => person.branchId === branch.id).length} label={companies.find((company) => company.id === branch.company_id)?.name ?? ''} />
+          <div className="mt-5 flex flex-col gap-3"><BranchBlock branch={branch} teams={teams} people={people} /></div>
+        </Card>
+      ))}
+    </div>
+  );
 }
 
 function TeamsView({ companies, branches, teams, people }: OrganizationData) {
   const { t } = useTranslation();
-  if (teams.length === 0) return <EmptyState icon={<UsersRound className="h-7 w-7" aria-hidden="true" />} title={t('organization.emptyTeams')} body={t('organization.emptyBody')} />;
-  return <div className="grid gap-5 xl:grid-cols-2">{teams.map((team) => { const branch = branches.find((item) => item.id === team.branch_id); return <Card key={team.id} className="p-5"><Heading icon={<UsersRound />} title={team.name} count={people.filter((person) => person.teamId === team.id).length} label={branch ? `${companies.find((company) => company.id === branch.company_id)?.name ?? ''} · ${branch.name}` : ''} /><PeopleList people={people.filter((person) => person.teamId === team.id)} emptyLabel={t('organization.noPeople')} /></Card>; })}</div>;
+  if (teams.length === 0) return <Card><EmptyState icon={<UsersRound className="h-7 w-7" aria-hidden="true" />} title={t('organization.emptyTeams')} body={t('organization.emptyBody')} /></Card>;
+  return (
+    <div className="grid gap-5 xl:grid-cols-2">
+      {teams.map((team) => {
+        const branch = branches.find((item) => item.id === team.branch_id);
+        return (
+          <Card key={team.id} interactive className="p-5">
+            <Heading icon={<UsersRound />} title={team.name} count={people.filter((person) => person.teamId === team.id).length} label={branch ? `${companies.find((company) => company.id === branch.company_id)?.name ?? ''} · ${branch.name}` : ''} />
+            <PeopleList people={people.filter((person) => person.teamId === team.id)} emptyLabel={t('organization.noPeople')} />
+          </Card>
+        );
+      })}
+    </div>
+  );
 }
 
 type OrganizationData = {
@@ -79,15 +105,56 @@ type OrganizationData = {
 function BranchBlock({ branch, teams, people }: { branch: OrganizationData['branches'][number]; teams: OrganizationData['teams']; people: RosterMember[] }) {
   const { t } = useTranslation();
   const branchTeams = teams.filter((team) => team.branch_id === branch.id);
-  return <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4"><div className="flex items-center justify-between gap-3"><span className="font-semibold text-primary-900">{branch.name}</span><Badge tone="neutral">{t('organization.teamsCount', { count: branchTeams.length })}</Badge></div><div className="mt-3 flex flex-col gap-3">{branchTeams.map((team) => <div key={team.id} className="rounded-lg border border-neutral-200 bg-white p-3"><div className="flex items-center justify-between gap-3"><span className="font-medium text-primary-900">{team.name}</span><span className="text-xs text-neutral-600">{t('organization.peopleCount', { count: people.filter((person) => person.teamId === team.id).length })}</span></div><PeopleList people={people.filter((person) => person.teamId === team.id)} emptyLabel={t('organization.noPeople')} /></div>)}</div></div>;
+  return (
+    <div className="rounded-xl border border-app-soft bg-neutral-50/60 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-semibold text-primary-900">{branch.name}</span>
+        <Badge tone="neutral">{t('organization.teamsCount', { count: branchTeams.length })}</Badge>
+      </div>
+      <div className="mt-3 flex flex-col gap-3">
+        {branchTeams.map((team) => (
+          <div key={team.id} className="rounded-lg border border-app-soft bg-surface p-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-medium text-primary-900">{team.name}</span>
+              <span className="text-xs text-neutral-500">{t('organization.peopleCount', { count: people.filter((person) => person.teamId === team.id).length })}</span>
+            </div>
+            <PeopleList people={people.filter((person) => person.teamId === team.id)} emptyLabel={t('organization.noPeople')} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function PeopleList({ people, emptyLabel }: { people: RosterMember[]; emptyLabel: string }) {
-  return <div className="mt-3 flex flex-col gap-2">{people.length === 0 ? <p className="text-xs text-neutral-500">{emptyLabel}</p> : people.map((person) => <div key={person.id} className="flex items-center justify-between gap-3 border-t border-neutral-100 pt-2 text-sm"><span className="truncate font-medium text-primary-900">{person.fullNameEn}</span><span className="shrink-0 font-mono text-xs text-neutral-500" dir="ltr">{person.userId}</span></div>)}</div>;
+  return (
+    <div className="mt-3 flex flex-col gap-2">
+      {people.length === 0 ? (
+        <p className="text-xs text-neutral-400">{emptyLabel}</p>
+      ) : (
+        people.map((person) => (
+          <div key={person.id} className="flex items-center justify-between gap-3 border-t border-app-soft pt-2 text-sm">
+            <span className="truncate font-medium text-primary-900">{person.fullNameEn}</span>
+            <span className="shrink-0 font-mono text-xs text-neutral-400" dir="ltr">{person.userId}</span>
+          </div>
+        ))
+      )}
+    </div>
+  );
 }
 
 function Heading({ icon, title, count, label }: { icon: ReactNode; title: string; count: number; label: string }) {
-  return <div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-700">{icon}</span><div className="min-w-0 flex-1"><h2 className="truncate text-lg font-semibold text-primary-900">{title}</h2><p className="text-xs text-neutral-600">{label} · {count}</p></div></div>;
+  return (
+    <div className="flex items-start gap-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-700 transition-transform hover:scale-110">
+        {icon}
+      </span>
+      <div className="min-w-0 flex-1">
+        <h2 className="truncate text-lg font-semibold text-primary-900">{title}</h2>
+        <p className="text-xs text-neutral-500">{label} · {count}</p>
+      </div>
+    </div>
+  );
 }
 
 function comparePeople(left: RosterMember, right: RosterMember) {
