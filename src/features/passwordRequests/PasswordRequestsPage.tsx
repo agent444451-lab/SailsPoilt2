@@ -37,7 +37,7 @@ export function PasswordRequestsPage() {
     return items.filter((item) => {
       const matchesSearch =
         !term ||
-        [item.fullNameEn, item.fullNameAr, item.email, item.userId].some((field) =>
+        [item.members?.full_name_en, item.members?.email, item.members?.user_id].some((field) =>
           (field ?? '').toLowerCase().includes(term)
         );
       const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
@@ -151,16 +151,13 @@ export function PasswordRequestsPage() {
                     <tr key={item.id} className="group transition-colors hover:bg-neutral-50/60">
                       <td className="px-4 py-3.5">
                         <div className="flex flex-col">
-                          <span className="font-medium text-primary-900" dir="auto">{item.fullNameEn}</span>
-                          {item.fullNameAr && (
-                            <span className="text-xs text-neutral-500" dir="auto">{item.fullNameAr}</span>
-                          )}
-                          <span className="text-xs text-neutral-400" dir="ltr">{item.email}</span>
+                          <span className="font-medium text-primary-900" dir="auto">{item.members?.full_name_en}</span>
+                          <span className="text-xs text-neutral-400" dir="ltr">{item.members?.email}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 font-mono text-neutral-600" dir="ltr">{item.userId}</td>
+                      <td className="px-4 py-3.5 font-mono text-neutral-600" dir="ltr">{item.members?.user_id}</td>
                       <td className="px-4 py-3.5 text-neutral-600 whitespace-nowrap">
-                        {new Date(item.requestedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                        {new Date(item.requested_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </td>
                       <td className="px-4 py-3.5">
                         <Badge tone={STATUS_TONE[item.status]} dot>

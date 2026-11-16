@@ -66,7 +66,7 @@ export function RosterPage() {
           status: fields.status,
           companyId: editing.companyId,
           branchId: fields.branchId,
-          teamId: fields.teamId,
+          teamId: editing.teamId,
           customRankId: fields.customRankId,
         },
       },
